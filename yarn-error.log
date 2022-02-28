@@ -1,5 +1,5 @@
 Arguments: 
-  /home/subhan/.nvm/versions/node/v14.18.2/bin/node /home/subhan/.yarn/bin/yarnpkg install
+  /home/subhan/.nvm/versions/node/v14.18.2/bin/node /home/subhan/.yarn/bin/yarn.js
 
 PATH: 
   /home/subhan/.yarn/bin:/home/subhan/.config/yarn/global/node_modules/.bin:/home/subhan/.nvm/versions/node/v14.18.2/bin:/home/subhan/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
