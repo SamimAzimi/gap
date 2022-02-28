@@ -1,7 +1,18 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { StyleSheet, Text, View, Image, Button } from 'react-native'
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function WelcomePage({ navigation }) {
+
+    useEffect(async () => {
+        try {
+            const value = await AsyncStorage.getItem('user')
+            if (value !== null) {
+                navigation.navigate("ChatRoom")
+            }
+        } catch (e) {
+            console.log(e)
+        }
+    })
     return (
 
         <View style={styles.container}>
@@ -9,7 +20,6 @@ export default function WelcomePage({ navigation }) {
             <Image style={styles.img} source={require('../assets/ChatLogo.jpeg')} />
             <View style={styles.groupBtn}>
                 <Button color="#F23005" title="Login" onPress={() => navigation.navigate("SignIn")} />
-                <Button color="#7D6BF2" title=" Sign Up" onPress={() => navigation.navigate("SignUp")} />
             </View>
         </View>
 

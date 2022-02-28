@@ -1,26 +1,62 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { io } from "socket.io-client";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+let socket;
+const URL = "http://10.10.10.244:3000"
 
 export default function SingleUser() {
-    const [socketID, setSocketID] = useState()
     const [chatMessage, setChatMessage] = useState()
-    const [onlineUsers, setOnlineUsers] = useState()
-    const socket = io("http://10.10.10.244:3000")
+    const [recieveMessages, setRecieveMessages] = useState([])
+
     useEffect(() => {
-        socket.on("connect", () => { setSocketID(socket.id) });
+        socket = io(URL)
+    }, [URL])
+
+    useEffect(() => {
+        socket.on("recieveMessage", (msg) => { setRecieveMessages([...recieveMessages, msg]) })
+
+        socket.on("userQuantity", (msg) => { console.log(msg) })
 
 
-    }, [])
-    const handleSend = () => {
-        socket.emit('message', chatMessage)
+    })
+
+
+
+    const handleSend = async () => {
+        const value = await AsyncStorage.getItem('user')
+        if (value == null) {
+            navigation.navigate("Welcome")
+        }
+        const UserObject = JSON.parse(value)
+        const Message = {
+            user: UserObject.userName,
+            text: chatMessage,
+            date: new Date().getHours() + ":" + new Date().getMinutes(),
+        }
+        socket.emit('message', Message)
         setChatMessage('')
     }
+
+    const chatmessages = recieveMessages.map((msg, index) => {
+        return (
+            <View key={index} >
+                <View style={styles.autherDate}>
+                    <Text >{msg.user}</Text>
+                    <Text >{msg.date}</Text>
+                </View>
+                <View style={styles.OneMessageContainer}>
+                    <Text style={{ color: "white" }}>{msg.text}</Text>
+                </View>
+            </View>
+        )
+    }
+    )
     return (
         <View style={styles.container}>
-            <Text style={styles.header}>Chat With Name</Text>
+            <Text style={styles.header}>Global Chat Room</Text>
             <View style={styles.messagesContainer}>
-                <Text>Chat With Name</Text>
+                {chatmessages}
             </View>
             <View style={styles.messageContainer}>
                 <TextInput value={chatMessage}
@@ -49,11 +85,22 @@ const styles = StyleSheet.create({
         fontSize: 23
     },
     messagesContainer: {
-        flexWrap: "wrap",
+        padding: 23,
         height: "85%",
         borderWidth: 1,
         borderColor: "red",
-        justifyContent: "flex-end",
+        overflow: "scroll",
+
+    },
+    autherDate: {
+        flexDirection: "row-reverse",
+        justifyContent: "space-between",
+        width: "20%",
+    },
+    OneMessageContainer: {
+        backgroundColor: "#F23005",
+        marginBottom: "2%",
+
     },
     text: {
         borderWidth: 1,
@@ -81,7 +128,6 @@ const styles = StyleSheet.create({
         marginTop: 20
     },
     btnsendContainer: {
-
         backgroundColor: "#F23005",
         width: "16%",
         height: "100%",
